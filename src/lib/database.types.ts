@@ -1,5 +1,6 @@
 export type Course = {
   id: string;
+  user_id: string | null;
   title: string;
   description: string | null;
   progress: number;
@@ -8,6 +9,7 @@ export type Course = {
 
 export type StudyRecord = {
   id: string;
+  user_id: string | null;
   course_id: string | null;
   duration_min: number;
   studied_at: string;
@@ -16,6 +18,7 @@ export type StudyRecord = {
 
 export type Goal = {
   id: string;
+  user_id: string | null;
   title: string;
   deadline: string | null;
   reminder_time: string | null;

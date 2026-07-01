@@ -40,10 +40,12 @@ export default function GoalsPage() {
     if (!title.trim()) return;
     setSubmitting(true);
     setError("");
+    const { data: { user } } = await supabase.auth.getUser();
     const { error: insertError } = await supabase.from("goals").insert({
       title: title.trim(),
       deadline: deadline || null,
       reminder_time: reminderTime || null,
+      user_id: user?.id,
     });
     if (insertError) {
       setError(insertError.message);

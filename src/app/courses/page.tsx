@@ -39,10 +39,12 @@ export default function CoursesPage() {
     if (!title.trim()) return;
     setSubmitting(true);
     setError("");
+    const { data: { user } } = await supabase.auth.getUser();
     const { error: insertError } = await supabase.from("courses").insert({
       title: title.trim(),
       description: description.trim() || null,
       progress: 0,
+      user_id: user?.id,
     });
     if (insertError) {
       setError(insertError.message);

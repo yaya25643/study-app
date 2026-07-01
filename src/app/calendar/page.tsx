@@ -73,10 +73,12 @@ export default function CalendarPage() {
     if (!duration) return;
     setSubmitting(true);
     setError("");
+    const { data: { user } } = await supabase.auth.getUser();
     const { error: insertError } = await supabase.from("study_records").insert({
       duration_min: Number(duration),
       course_id: courseId || null,
       studied_at: studiedAt,
+      user_id: user?.id,
     });
     if (insertError) {
       setError(insertError.message);

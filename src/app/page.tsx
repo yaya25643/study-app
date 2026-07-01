@@ -63,10 +63,12 @@ export default function DashboardPage() {
     if (!durationMin) return;
     setSubmitting(true);
     setError("");
+    const { data: { user } } = await supabase.auth.getUser();
     const { error: insertError } = await supabase.from("study_records").insert({
       duration_min: Number(durationMin),
       course_id: courseId || null,
       studied_at: new Date().toISOString().slice(0, 10),
+      user_id: user?.id,
     });
     if (insertError) {
       setError(insertError.message);
