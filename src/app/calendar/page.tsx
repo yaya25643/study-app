@@ -177,16 +177,16 @@ export default function CalendarPage() {
             学習記録を追加
           </h2>
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <label className="text-sm text-slate-600">
+            <label className="block text-sm text-slate-600">
               日付
               <input
                 type="date"
                 value={studiedAt}
                 onChange={(e) => setStudiedAt(e.target.value)}
-                className="mt-1 box-border w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                className="mt-1 box-border w-full min-w-0 appearance-none rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
               />
             </label>
-            <label className="text-sm text-slate-600">
+            <label className="block text-sm text-slate-600">
               学習時間(分)
               <input
                 type="number"
@@ -197,7 +197,7 @@ export default function CalendarPage() {
                 className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
               />
             </label>
-            <label className="text-sm text-slate-600">
+            <label className="block text-sm text-slate-600">
               教材
               <select
                 value={courseId}

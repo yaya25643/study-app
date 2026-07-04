@@ -77,7 +77,7 @@ export default function GoalsPage() {
         onSubmit={handleSubmit}
         className="mb-6 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-5"
       >
-        <label className="text-sm text-slate-600">
+        <label className="block text-sm text-slate-600">
           目標
           <input
             type="text"
@@ -88,22 +88,22 @@ export default function GoalsPage() {
             className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
           />
         </label>
-        <label className="text-sm text-slate-600">
+        <label className="block text-sm text-slate-600">
           期限
           <input
             type="date"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
-            className="mt-1 box-border w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 box-border w-full min-w-0 appearance-none rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
           />
         </label>
-        <label className="text-sm text-slate-600">
+        <label className="block text-sm text-slate-600">
           リマインダー
           <input
             type="time"
             value={reminderTime}
             onChange={(e) => setReminderTime(e.target.value)}
-            className="mt-1 box-border w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 box-border w-full min-w-0 appearance-none rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
           />
         </label>
         <button

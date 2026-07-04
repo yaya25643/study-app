@@ -65,7 +65,7 @@ export default function LoginPage() {
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="text-sm text-slate-600">
+          <label className="block text-sm text-slate-600">
             メールアドレス
             <input
               type="email"
@@ -76,7 +76,7 @@ export default function LoginPage() {
               placeholder="example@email.com"
             />
           </label>
-          <label className="text-sm text-slate-600">
+          <label className="block text-sm text-slate-600">
             パスワード
             <input
               type="password"

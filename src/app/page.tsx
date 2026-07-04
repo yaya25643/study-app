@@ -117,7 +117,7 @@ export default function DashboardPage() {
             今日の学習記録
           </h2>
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <label className="text-sm text-slate-600">
+            <label className="block text-sm text-slate-600">
               学習時間(分)
               <input
                 type="number"
@@ -129,7 +129,7 @@ export default function DashboardPage() {
                 placeholder="例: 60"
               />
             </label>
-            <label className="text-sm text-slate-600">
+            <label className="block text-sm text-slate-600">
               学習内容
               <select
                 value={courseId}
