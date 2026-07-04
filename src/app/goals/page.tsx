@@ -94,7 +94,7 @@ export default function GoalsPage() {
             type="date"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 box-border w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
           />
         </label>
         <label className="text-sm text-slate-600">
@@ -103,7 +103,7 @@ export default function GoalsPage() {
             type="time"
             value={reminderTime}
             onChange={(e) => setReminderTime(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            className="mt-1 box-border w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
           />
         </label>
         <button

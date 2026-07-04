@@ -150,10 +150,10 @@ export default function CalendarPage() {
                   type="button"
                   title={`${key}: ${minutes}分`}
                   onClick={() => setSelectedDate(key)}
-                  className={`flex aspect-square flex-col items-center justify-center rounded text-xs ${intensityClass(
+                  className={`flex aspect-square w-full flex-col items-center justify-center rounded text-xs ${intensityClass(
                     minutes
                   )} ${dim ? "opacity-30" : ""} ${
-                    selected ? "ring-2 ring-blue-600" : ""
+                    selected ? "ring-2 ring-inset ring-blue-600" : ""
                   }`}
                 >
                   {format(day, "d")}
@@ -183,7 +183,7 @@ export default function CalendarPage() {
                 type="date"
                 value={studiedAt}
                 onChange={(e) => setStudiedAt(e.target.value)}
-                className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                className="mt-1 box-border w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
               />
             </label>
             <label className="text-sm text-slate-600">
@@ -246,7 +246,7 @@ export default function CalendarPage() {
                     </span>
                   </div>
                 ))}
-                <div className="mt-1 flex items-center justify-between border-t border-slate-200 pt-2 text-sm font-semibold">
+                <div className="mt-1 flex items-center justify-between border-t border-slate-200 pt-2 text-sm font-semibold text-slate-900">
                   <span>合計</span>
                   <span>
                     {selectedDateRecords.reduce((sum, r) => sum + r.duration_min, 0)}分
