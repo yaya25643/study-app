@@ -36,6 +36,7 @@ export default function CalendarPage() {
   const [studiedAt, setStudiedAt] = useState(
     new Date().toISOString().slice(0, 10)
   );
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -67,6 +68,17 @@ export default function CalendarPage() {
     const end = endOfWeek(endOfMonth(month), { weekStartsOn: 0 });
     return eachDayOfInterval({ start, end });
   }, [month]);
+
+  const courseNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const c of courses) map.set(c.id, c.title);
+    return map;
+  }, [courses]);
+
+  const selectedDateRecords = useMemo(() => {
+    if (!selectedDate) return [];
+    return records.filter((r) => r.studied_at === selectedDate);
+  }, [records, selectedDate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -131,16 +143,21 @@ export default function CalendarPage() {
               const key = format(day, "yyyy-MM-dd");
               const minutes = minutesByDate.get(key) ?? 0;
               const dim = !isSameMonth(day, month);
+              const selected = key === selectedDate;
               return (
-                <div
+                <button
                   key={key}
+                  type="button"
                   title={`${key}: ${minutes}分`}
+                  onClick={() => setSelectedDate(key)}
                   className={`flex aspect-square flex-col items-center justify-center rounded text-xs ${intensityClass(
                     minutes
-                  )} ${dim ? "opacity-30" : ""}`}
+                  )} ${dim ? "opacity-30" : ""} ${
+                    selected ? "ring-2 ring-blue-600" : ""
+                  }`}
                 >
                   {format(day, "d")}
-                </div>
+                </button>
               );
             })}
           </div>
@@ -204,6 +221,41 @@ export default function CalendarPage() {
             </button>
           </form>
         </div>
+
+        {selectedDate && (
+          <div className="rounded-xl border border-slate-200 bg-white p-5 md:col-span-3">
+            <h2 className="mb-4 text-sm font-semibold text-slate-500">
+              {format(new Date(selectedDate), "yyyy年M月d日", { locale: ja })}の内訳
+            </h2>
+            {selectedDateRecords.length === 0 ? (
+              <p className="text-sm text-slate-500">この日の記録はありません。</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {selectedDateRecords.map((r) => (
+                  <div
+                    key={r.id}
+                    className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-2"
+                  >
+                    <span className="text-sm text-slate-700">
+                      {r.course_id
+                        ? courseNameById.get(r.course_id) ?? "(削除された教材)"
+                        : "教材未設定"}
+                    </span>
+                    <span className="text-sm font-medium text-slate-900">
+                      {r.duration_min}分
+                    </span>
+                  </div>
+                ))}
+                <div className="mt-1 flex items-center justify-between border-t border-slate-200 pt-2 text-sm font-semibold">
+                  <span>合計</span>
+                  <span>
+                    {selectedDateRecords.reduce((sum, r) => sum + r.duration_min, 0)}分
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
