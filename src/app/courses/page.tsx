@@ -63,7 +63,8 @@ export default function CoursesPage() {
     await supabase.from("courses").update({ progress }).eq("id", id);
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, title: string) {
+    if (!window.confirm(`「${title}」を削除しますか?`)) return;
     await supabase.from("courses").delete().eq("id", id);
     setCourses((prev) => prev.filter((c) => c.id !== id));
   }
@@ -126,7 +127,7 @@ export default function CoursesPage() {
                 )}
               </div>
               <button
-                onClick={() => handleDelete(course.id)}
+                onClick={() => handleDelete(course.id, course.title)}
                 className="text-xs text-red-500 hover:underline"
               >
                 削除

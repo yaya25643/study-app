@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+import MobileNav from "@/components/MobileNav";
 import AuthGuard from "@/components/AuthGuard";
 
 const geistSans = Geist({
@@ -32,7 +33,8 @@ export default function RootLayout({
       <body className="min-h-full flex bg-slate-50 text-slate-900">
         <AuthGuard>
           <Sidebar />
-          <main className="flex-1 p-6 md:p-8">{children}</main>
+          <main className="flex-1 p-6 pb-20 md:p-8 md:pb-8">{children}</main>
+          <MobileNav />
         </AuthGuard>
       </body>
     </html>

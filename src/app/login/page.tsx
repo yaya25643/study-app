@@ -27,7 +27,9 @@ export default function LoginPage() {
       if (signUpError) {
         setError(signUpError.message);
       } else {
-        setMessage("確認メールを送信しました。メールを確認してください。");
+        setMessage("アカウントを作成しました。そのままログインできます。");
+        // 自動でログイン
+        await supabase.auth.signInWithPassword({ email, password });
       }
     } else {
       const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -35,7 +37,7 @@ export default function LoginPage() {
         password,
       });
       if (signInError) {
-        setError("メールアドレスまたはパスワードが正しくありません。");
+        setError(signInError.message);
       }
     }
     setLoading(false);

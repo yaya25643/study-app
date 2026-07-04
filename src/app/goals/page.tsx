@@ -57,7 +57,8 @@ export default function GoalsPage() {
     setSubmitting(false);
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: string, title: string) {
+    if (!window.confirm(`「${title}」を削除しますか?`)) return;
     await supabase.from("goals").delete().eq("id", id);
     setGoals((prev) => prev.filter((g) => g.id !== id));
   }
@@ -132,7 +133,7 @@ export default function GoalsPage() {
               </p>
             </div>
             <button
-              onClick={() => handleDelete(goal.id)}
+              onClick={() => handleDelete(goal.id, goal.title)}
               className="text-xs text-red-500 hover:underline"
             >
               削除
