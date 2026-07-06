@@ -102,6 +102,12 @@ export default function CalendarPage() {
     setSubmitting(false);
   }
 
+  async function handleDeleteRecord(id: string) {
+    if (!window.confirm("この記録を削除しますか?")) return;
+    await supabase.from("study_records").delete().eq("id", id);
+    setRecords((prev) => prev.filter((r) => r.id !== id));
+  }
+
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
 
   return (
@@ -241,9 +247,18 @@ export default function CalendarPage() {
                         ? courseNameById.get(r.course_id) ?? "(削除された教材)"
                         : "教材未設定"}
                     </span>
-                    <span className="text-sm font-medium text-slate-900">
-                      {r.duration_min}分
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-slate-900">
+                        {r.duration_min}分
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteRecord(r.id)}
+                        className="text-xs text-red-500 hover:underline"
+                      >
+                        削除
+                      </button>
+                    </div>
                   </div>
                 ))}
                 <div className="mt-1 flex items-center justify-between border-t border-slate-200 pt-2 text-sm font-semibold text-slate-900">
