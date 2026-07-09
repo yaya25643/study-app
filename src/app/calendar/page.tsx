@@ -39,6 +39,10 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDuration, setEditDuration] = useState("");
+  const [editCourseId, setEditCourseId] = useState("");
+  const [editStudiedAt, setEditStudiedAt] = useState("");
 
   async function loadData() {
     if (!isSupabaseConfigured) return;
@@ -106,6 +110,49 @@ export default function CalendarPage() {
     if (!window.confirm("この記録を削除しますか?")) return;
     await supabase.from("study_records").delete().eq("id", id);
     setRecords((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  function startEdit(record: StudyRecord) {
+    setEditingId(record.id);
+    setEditDuration(String(record.duration_min));
+    setEditCourseId(record.course_id ?? "");
+    setEditStudiedAt(record.studied_at);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditDuration("");
+    setEditCourseId("");
+    setEditStudiedAt("");
+  }
+
+  async function handleEditSave(id: string) {
+    if (!editDuration) return;
+    const { error: updateError } = await supabase
+      .from("study_records")
+      .update({
+        duration_min: Number(editDuration),
+        course_id: editCourseId || null,
+        studied_at: editStudiedAt,
+      })
+      .eq("id", id);
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+    setRecords((prev) =>
+      prev.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              duration_min: Number(editDuration),
+              course_id: editCourseId || null,
+              studied_at: editStudiedAt,
+            }
+          : r
+      )
+    );
+    cancelEdit();
   }
 
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
@@ -237,30 +284,87 @@ export default function CalendarPage() {
               <p className="text-sm text-slate-500">この日の記録はありません。</p>
             ) : (
               <div className="flex flex-col gap-2">
-                {selectedDateRecords.map((r) => (
-                  <div
-                    key={r.id}
-                    className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-2"
-                  >
-                    <span className="text-sm text-slate-700">
-                      {r.course_id
-                        ? courseNameById.get(r.course_id) ?? "(削除された教材)"
-                        : "教材未設定"}
-                    </span>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-medium text-slate-900">
-                        {r.duration_min}分
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteRecord(r.id)}
-                        className="text-xs text-red-500 hover:underline"
+                {selectedDateRecords.map((r) =>
+                  editingId === r.id ? (
+                    <div
+                      key={r.id}
+                      className="flex flex-col gap-2 rounded-lg border border-blue-300 bg-white p-3"
+                    >
+                      <input
+                        type="date"
+                        value={editStudiedAt}
+                        onChange={(e) => setEditStudiedAt(e.target.value)}
+                        className="box-border w-full min-w-0 appearance-none rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                      />
+                      <input
+                        type="number"
+                        min={1}
+                        value={editDuration}
+                        onChange={(e) => setEditDuration(e.target.value)}
+                        className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                        placeholder="学習時間(分)"
+                      />
+                      <select
+                        value={editCourseId}
+                        onChange={(e) => setEditCourseId(e.target.value)}
+                        className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
                       >
-                        削除
-                      </button>
+                        <option value="">教材未設定</option>
+                        {courses.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.title}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleEditSave(r.id)}
+                          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                        >
+                          保存
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelEdit}
+                          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                        >
+                          キャンセル
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ) : (
+                    <div
+                      key={r.id}
+                      className="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-2"
+                    >
+                      <span className="text-sm text-slate-700">
+                        {r.course_id
+                          ? courseNameById.get(r.course_id) ?? "(削除された教材)"
+                          : "教材未設定"}
+                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-slate-900">
+                          {r.duration_min}分
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => startEdit(r)}
+                          className="text-xs text-blue-600 hover:underline"
+                        >
+                          編集
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteRecord(r.id)}
+                          className="text-xs text-red-500 hover:underline"
+                        >
+                          削除
+                        </button>
+                      </div>
+                    </div>
+                  )
+                )}
                 <div className="mt-1 flex items-center justify-between border-t border-slate-200 pt-2 text-sm font-semibold text-slate-900">
                   <span>合計</span>
                   <span>

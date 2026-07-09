@@ -14,6 +14,9 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   async function loadCourses() {
     if (!isSupabaseConfigured) {
@@ -69,6 +72,41 @@ export default function CoursesPage() {
     setCourses((prev) => prev.filter((c) => c.id !== id));
   }
 
+  function startEdit(course: Course) {
+    setEditingId(course.id);
+    setEditTitle(course.title);
+    setEditDescription(course.description ?? "");
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditTitle("");
+    setEditDescription("");
+  }
+
+  async function handleEditSave(id: string) {
+    if (!editTitle.trim()) return;
+    const { error: updateError } = await supabase
+      .from("courses")
+      .update({
+        title: editTitle.trim(),
+        description: editDescription.trim() || null,
+      })
+      .eq("id", id);
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+    setCourses((prev) =>
+      prev.map((c) =>
+        c.id === id
+          ? { ...c, title: editTitle.trim(), description: editDescription.trim() || null }
+          : c
+      )
+    );
+    cancelEdit();
+  }
+
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="mb-6 text-2xl font-bold">教材一覧</h1>
@@ -112,50 +150,94 @@ export default function CoursesPage() {
         {!loading && courses.length === 0 && (
           <p className="text-sm text-slate-500">まだ教材がありません。</p>
         )}
-        {courses.map((course) => (
-          <div
-            key={course.id}
-            className="rounded-xl border border-slate-200 bg-white p-5"
-          >
-            <div className="mb-2 flex items-start justify-between">
-              <div>
-                <h3 className="font-semibold text-slate-900">{course.title}</h3>
-                {course.description && (
-                  <p className="text-sm text-slate-500">
-                    {course.description}
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={() => handleDelete(course.id, course.title)}
-                className="text-xs text-red-500 hover:underline"
-              >
-                削除
-              </button>
-            </div>
-            <div className="flex items-center gap-3">
+        {courses.map((course) =>
+          editingId === course.id ? (
+            <div
+              key={course.id}
+              className="flex flex-col gap-3 rounded-xl border border-blue-300 bg-white p-5"
+            >
               <input
-                type="range"
-                min={0}
-                max={100}
-                value={course.progress}
-                onChange={(e) =>
-                  handleProgressChange(course.id, Number(e.target.value))
-                }
-                className="flex-1"
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                placeholder="教材名"
               />
-              <span className="w-12 text-right text-sm font-medium text-slate-600">
-                {course.progress}%
-              </span>
-            </div>
-            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-              <div
-                className="h-full bg-blue-600"
-                style={{ width: `${course.progress}%` }}
+              <input
+                type="text"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                placeholder="説明(任意)"
               />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleEditSave(course.id)}
+                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                >
+                  保存
+                </button>
+                <button
+                  onClick={cancelEdit}
+                  className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                >
+                  キャンセル
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ) : (
+            <div
+              key={course.id}
+              className="rounded-xl border border-slate-200 bg-white p-5"
+            >
+              <div className="mb-2 flex items-start justify-between">
+                <div>
+                  <h3 className="font-semibold text-slate-900">{course.title}</h3>
+                  {course.description && (
+                    <p className="text-sm text-slate-500">
+                      {course.description}
+                    </p>
+                  )}
+                </div>
+                <div className="flex shrink-0 gap-3">
+                  <button
+                    onClick={() => startEdit(course)}
+                    className="text-xs text-blue-600 hover:underline"
+                  >
+                    編集
+                  </button>
+                  <button
+                    onClick={() => handleDelete(course.id, course.title)}
+                    className="text-xs text-red-500 hover:underline"
+                  >
+                    削除
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={course.progress}
+                  onChange={(e) =>
+                    handleProgressChange(course.id, Number(e.target.value))
+                  }
+                  className="flex-1"
+                />
+                <span className="w-12 text-right text-sm font-medium text-slate-600">
+                  {course.progress}%
+                </span>
+              </div>
+              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full bg-blue-600"
+                  style={{ width: `${course.progress}%` }}
+                />
+              </div>
+            </div>
+          )
+        )}
       </div>
     </div>
   );
